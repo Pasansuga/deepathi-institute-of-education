@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Register — Deepathi Institute of Education</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-mark"><img src="logo.png" alt="Deepathi Institute logo" /></span>
+      <span>Deepathi <span class="brand-sub">Institute of Education</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="register.html" class="active">Register</a></li>
+      <li><a href="student.html">Student Portal</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="form-page">
+  <div class="container">
+    <div class="form-card">
+      <div class="form-head">
+        <div class="ornament">— Enrolment —</div>
+        <h1>Student Registration</h1>
+        <p>Please complete the form below. A student ID will be issued upon submission.</p>
+      </div>
+
+      <div id="notice"></div>
+
+      <form id="reg-form" novalidate>
+
+        <div class="form-section-title">Student Particulars</div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>First Name <span class="req">*</span></label>
+            <input type="text" name="firstName" required />
+          </div>
+          <div class="field">
+            <label>Last Name <span class="req">*</span></label>
+            <input type="text" name="lastName" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Date of Birth <span class="req">*</span></label>
+            <input type="date" name="dob" required />
+          </div>
+          <div class="field">
+            <label>Gender</label>
+            <select name="gender">
+              <option value="">— select —</option>
+              <option>Female</option>
+              <option>Male</option>
+              <option>Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>School <span class="req">*</span></label>
+            <input type="text" name="school" required />
+          </div>
+          <div class="field">
+            <label>Current Grade / Year <span class="req">*</span></label>
+            <input type="text" name="grade" required placeholder="e.g. Grade 10, Year 12" />
+          </div>
+        </div>
+
+        <div class="form-section-title">Programme</div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Syllabus <span class="req">*</span></label>
+            <select name="syllabus" required>
+              <option value="">— select —</option>
+              <option>Edexcel</option>
+              <option>Cambridge</option>
+              <option>Sri Lanka National</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Level <span class="req">*</span></label>
+            <select name="level" required>
+              <option value="">— select —</option>
+              <option>Primary (Grades 1–5)</option>
+              <option>Lower Secondary (Grades 6–9)</option>
+              <option>O/L · IGCSE</option>
+              <option>A/L · AS &amp; A2</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label>Subjects / Modules of Interest</label>
+            <input type="text" name="subjects" placeholder="e.g. Pure Maths, Mechanics, Statistics" />
+          </div>
+        </div>
+
+        <div class="form-section-title">Parent / Guardian</div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Parent / Guardian Name <span class="req">*</span></label>
+            <input type="text" name="guardian" required />
+          </div>
+          <div class="field">
+            <label>Relationship</label>
+            <input type="text" name="relationship" placeholder="Mother, Father, Guardian" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Contact Number <span class="req">*</span></label>
+            <input type="tel" name="phone" required placeholder="+94 ..." />
+          </div>
+          <div class="field">
+            <label>Email Address <span class="req">*</span></label>
+            <input type="email" name="email" required />
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label>Address</label>
+            <textarea name="address" rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label>Notes for the Institute</label>
+            <textarea name="notes" rows="3" placeholder="Anything we should know — preferred timings, prior tuition, areas of difficulty, etc."></textarea>
+          </div>
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" required />
+          <span>I confirm the information provided is accurate, and I consent to Deepathi Institute of Education contacting me regarding this registration.</span>
+        </label>
+
+        <button type="submit" class="btn btn-full">Submit Registration</button>
+
+        <p class="hint">On successful submission you will receive a unique student ID — please keep it safe.</p>
+
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot-bottom">
+      <span>© <span id="year"></span> Deepathi Institute of Education.</span>
+      <span><a href="index.html">Return home</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const form = document.getElementById('reg-form');
+const notice = document.getElementById('notice');
+
+function generateId() {
+  // DPT-YY-NNNN format. NNNN is incremental across this browser's registrations.
+  const list = JSON.parse(localStorage.getItem('deepathi_students') || '[]');
+  const yy = String(new Date().getFullYear()).slice(-2);
+  const seq = String(list.length + 1).padStart(4, '0');
+  return `DPT-${yy}-${seq}`;
+}
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  notice.innerHTML = '';
+
+  // Native validity check
+  if (!form.checkValidity()) {
+    notice.innerHTML = '<div class="notice error">Please complete all required fields marked with <strong>*</strong>.</div>';
+    form.reportValidity();
+    return;
+  }
+
+  // The Sri Lanka National syllabus is offered only up to O/L
+  const syll = form.elements['syllabus'].value;
+  const lvl  = form.elements['level'].value;
+  if (syll === 'Sri Lanka National' && lvl.startsWith('A/L')) {
+    notice.innerHTML = '<div class="notice error">The Sri Lanka National syllabus is offered up to G.C.E. O/L only. For A/L, please choose Edexcel or Cambridge.</div>';
+    notice.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const fd = new FormData(form);
+  const data = Object.fromEntries(fd.entries());
+  data.id = generateId();
+  data.registeredAt = new Date().toISOString();
+
+  // Save to localStorage (demo persistence — for production use a backend)
+  const list = JSON.parse(localStorage.getItem('deepathi_students') || '[]');
+  list.push(data);
+  localStorage.setItem('deepathi_students', JSON.stringify(list));
+
+  notice.innerHTML = `
+    <div class="notice success">
+      <strong>Registration received.</strong><br/>
+      The student ID is <strong style="font-family:'Fraunces',serif; letter-spacing:.05em;">${data.id}</strong> —
+      please note it down. You may now visit the
+      <a href="student.html?id=${encodeURIComponent(data.id)}">Student Portal</a> to view the record.
+    </div>`;
+  notice.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  form.reset();
+});
+</script>
+</body>
+</html>

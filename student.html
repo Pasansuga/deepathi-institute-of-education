@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Student Portal — Deepathi Institute of Education</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-mark"><img src="logo.png" alt="Deepathi Institute logo" /></span>
+      <span>Deepathi <span class="brand-sub">Institute of Education</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="register.html">Register</a></li>
+      <li><a href="student.html" class="active">Student Portal</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="form-page">
+  <div class="container">
+
+    <div style="text-align:center; margin-bottom: 36px;">
+      <div class="ornament" style="color: var(--brass); font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 10px;">— Student Portal —</div>
+      <h1 style="font-size: 42px; color: var(--navy);">Individual Student Record</h1>
+      <p style="color: var(--muted); margin-top: 10px;">Enter the student ID issued at registration to view the record.</p>
+    </div>
+
+    <div class="lookup">
+      <h2>Lookup</h2>
+      <p>Student IDs follow the format <em>DPT-YY-NNNN</em> (e.g. DPT-26-0001).</p>
+      <form id="lookup-form" class="lookup-row">
+        <input type="text" id="sid" placeholder="DPT-26-0001" required />
+        <button type="submit" class="btn">View</button>
+      </form>
+    </div>
+
+    <div id="result"></div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot-bottom">
+      <span>© <span id="year"></span> Deepathi Institute of Education.</span>
+      <span><a href="index.html">Return home</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const form = document.getElementById('lookup-form');
+const sidInput = document.getElementById('sid');
+const result = document.getElementById('result');
+
+function escapeHTML(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString('en-GB', { year:'numeric', month:'long', day:'numeric' });
+}
+
+function display(id) {
+  const list = JSON.parse(localStorage.getItem('deepathi_students') || '[]');
+  const s = list.find(x => x.id.toLowerCase() === id.toLowerCase());
+  if (!s) {
+    result.innerHTML = `<div class="notice error" style="max-width:560px; margin:0 auto;">
+      No record found for <strong>${escapeHTML(id)}</strong>. Please check the ID and try again.
+    </div>`;
+    return;
+  }
+
+  const fullName = `${s.firstName || ''} ${s.lastName || ''}`.trim();
+
+  result.innerHTML = `
+    <div class="student-card">
+      <div class="student-header">
+        <div class="who">
+          <h2>${escapeHTML(fullName)}</h2>
+          <p>${escapeHTML(s.syllabus || '—')} · ${escapeHTML(s.level || '—')}</p>
+        </div>
+        <div class="id-badge">
+          Student ID
+          <strong>${escapeHTML(s.id)}</strong>
+        </div>
+      </div>
+
+      <div class="student-body">
+
+        <h3 style="font-family:'Fraunces',serif; font-style:italic; color:var(--navy); font-size:22px; margin-bottom:20px;">Personal Particulars</h3>
+        <dl class="detail-grid">
+          <div class="detail"><dt>Date of Birth</dt><dd>${formatDate(s.dob)}</dd></div>
+          <div class="detail"><dt>Gender</dt><dd>${escapeHTML(s.gender || '—')}</dd></div>
+          <div class="detail"><dt>School</dt><dd>${escapeHTML(s.school || '—')}</dd></div>
+          <div class="detail"><dt>Current Grade</dt><dd>${escapeHTML(s.grade || '—')}</dd></div>
+        </dl>
+
+        <div class="student-section">
+          <h3>Programme</h3>
+          <dl class="detail-grid">
+            <div class="detail"><dt>Syllabus</dt><dd>${escapeHTML(s.syllabus || '—')}</dd></div>
+            <div class="detail"><dt>Level</dt><dd>${escapeHTML(s.level || '—')}</dd></div>
+            <div class="detail" style="grid-column: 1 / -1;"><dt>Subjects / Modules</dt><dd>${escapeHTML(s.subjects || '—')}</dd></div>
+          </dl>
+        </div>
+
+        <div class="student-section">
+          <h3>Parent / Guardian</h3>
+          <dl class="detail-grid">
+            <div class="detail"><dt>Name</dt><dd>${escapeHTML(s.guardian || '—')}</dd></div>
+            <div class="detail"><dt>Relationship</dt><dd>${escapeHTML(s.relationship || '—')}</dd></div>
+            <div class="detail"><dt>Contact Number</dt><dd>${escapeHTML(s.phone || '—')}</dd></div>
+            <div class="detail"><dt>Email</dt><dd>${escapeHTML(s.email || '—')}</dd></div>
+            <div class="detail" style="grid-column: 1 / -1;"><dt>Address</dt><dd>${escapeHTML(s.address || '—')}</dd></div>
+          </dl>
+        </div>
+
+        ${s.notes ? `
+        <div class="student-section">
+          <h3>Notes</h3>
+          <p style="color: var(--muted); font-size: 16px;">${escapeHTML(s.notes)}</p>
+        </div>` : ''}
+
+        <div class="student-section">
+          <h3>Registration</h3>
+          <dl class="detail-grid">
+            <div class="detail"><dt>Registered On</dt><dd>${formatDate(s.registeredAt)}</dd></div>
+            <div class="detail"><dt>Status</dt><dd style="color: var(--brass); font-style: italic;">Enrolment Pending Confirmation</dd></div>
+          </dl>
+        </div>
+
+      </div>
+    </div>
+    <p class="hint">Record retrieved from this browser's local storage.</p>
+  `;
+  result.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const id = sidInput.value.trim();
+  if (!id) return;
+  display(id);
+});
+
+// Auto-lookup if ?id= is in URL (used by register.html redirect link)
+const params = new URLSearchParams(location.search);
+const auto = params.get('id');
+if (auto) {
+  sidInput.value = auto;
+  display(auto);
+}
+</script>
+</body>
+</html>
